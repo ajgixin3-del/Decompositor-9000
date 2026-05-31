@@ -37,3 +37,26 @@ function renderApp() {
 
 // 4. Запускаем функцию
 renderApp();
+
+addSubtaskBtn.addEventListener('click', () => {
+    // 1. Получаем текст из инпута
+    const text = subtaskInput.value;
+    // 2. Проверяем, что юзер не жмет "Save" с пустым инпутом
+    if (text.trim() === '') {
+        alert('Сначала введи название подзадачи!');
+        return; // Выходим из функции, если там пусто
+    }
+
+    // 3. А вот теперь инженерная магия: добавляем объект в наш массив
+    tasks[0].subtasks.push({
+        id: `sub-${Date.now()}`, // Генерируем уникальный id через текущее время
+        title:text,
+        isCompleted: false
+    });
+
+    // 4. Очищаем инпут, чтобы он снова был пустым после добавления
+    subtaskInput.value = '';
+
+    // 5. Перерисовываем приложение
+    renderApp();
+})
