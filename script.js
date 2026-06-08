@@ -49,6 +49,7 @@ function renderApp() {
                 <li>
                   <input type="checkbox" data-id="${subtask.id}" ${isChecked} />
                   ${subtask.title}
+                  <button data-action="delete" data-id="${subtask.id}">Удалить</button>
                  </li>
             `;
         });
@@ -98,6 +99,17 @@ appContainer.addEventListener('change', (e) => {
                 subtask.isCompleted = e.target.checked;
             }
         });
+
+        saveTasks();
+        renderApp();
+    }
+});
+
+appContainer.addEventListener('click', (e) => {
+    if (e.target.dataset.action === 'delete') {
+        const subtaskId = e.target.dataset.id;
+
+        tasks[0].subtasks = tasks[0].subtasks.filter(subtask => subtask.id !== subtaskId);
 
         saveTasks();
         renderApp();
