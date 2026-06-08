@@ -20,14 +20,30 @@ function renderApp() {
     let htmlContent = '';
 
     tasks.forEach(task => {
+        const completedSubtasks = task.subtasks.filter(subtask => subtask.isCompleted);
+
         // Добавляем заголовок большой задачи
-        htmlContent += `<h2>Категория: ${task.title}</h2><ul>`;
+        htmlContent += `
+            <h2>Категория: ${task.title}</h2>
+            <p>Выполнено: ${completedSubtasks.length} из ${task.subtasks.length}</p>
+            <ul>
+        `;
 
         // Перебираем её подзадачи
         task.subtasks.forEach(subtask => {
-            htmlContent += `<li>${subtask.title} (Сделано: ${subtask.isCompleted})</li>`;
+            // Выясняем, нужен ли атрибут checked
+            const isChecked = subtask.isCompleted ? 'checked' : '';
+
+            // Собираем строку: сначала чекбокс, потом название подзадачи
+            htmlContent += `
+                <li>
+                  <input type="checkbox" data-id="${subtask.id}" ${isChecked} />
+                  ${subtask.title}
+                 </li>
+            `;
         });
 
+        // ЗАКРЫВАЕМ список и сам цикл больших задач (то, что случайно стерлось!)
         htmlContent += `</ul>`;
     });
 
@@ -40,9 +56,9 @@ renderApp();
 
 addSubtaskBtn.addEventListener('click', () => {
     // 1. Получаем текст из инпута
-    const text = subtaskInput.value;
+    const text = subtaskInput.value.trim();
     // 2. Проверяем, что юзер не жмет "Save" с пустым инпутом
-    if (text.trim() === '') {
+    if (text === '') {
         alert('Сначала введи название подзадачи!');
         return; // Выходим из функции, если там пусто
     }
@@ -50,7 +66,7 @@ addSubtaskBtn.addEventListener('click', () => {
     // 3. А вот теперь инженерная магия: добавляем объект в наш массив
     tasks[0].subtasks.push({
         id: `sub-${Date.now()}`, // Генерируем уникальный id через текущее время
-        title:text,
+        title: text,
         isCompleted: false
     });
 
@@ -59,4 +75,19 @@ addSubtaskBtn.addEventListener('click', () => {
 
     // 5. Перерисовываем приложение
     renderApp();
-})
+});
+
+// Слушаем изменения внутри всего контейнера приложения
+appContainer.addEventListener('change', (e) => {
+    if (e.target.type === 'checkbox') {
+        const subtaskId = e.target.dataset.id;
+
+        tasks[0].subtasks.forEach(subtask => {
+            if (subtask.id === subtaskId) {
+                subtask.isCompleted = e.target.checked;
+            }
+        });
+
+        renderApp();
+    }
+});
