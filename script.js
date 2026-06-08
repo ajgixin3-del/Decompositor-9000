@@ -1,5 +1,5 @@
 // 1. Создаем тестовые данные (Массив одной большой задачи)
-const tasks = [
+const defaultTasks = [
     {
         id: "task-1",
         title: "Купить продукты для пирога",
@@ -10,10 +10,17 @@ const tasks = [
     }
 ];
 
+const savedTasks = localStorage.getItem('tasks');
+const tasks = savedTasks ? JSON.parse(savedTasks) : defaultTasks;
+
 // 2. Находим наш контейнер в HTML
 const appContainer = document.getElementById('app');
 const subtaskInput = document.getElementById('subtask-input');
 const addSubtaskBtn = document.getElementById('add-subtask-btn');
+
+function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
 
 // 3. Пишем простую функцию, которая превратит массив в текст на экране
 function renderApp() {
@@ -21,11 +28,14 @@ function renderApp() {
 
     tasks.forEach(task => {
         const completedSubtasks = task.subtasks.filter(subtask => subtask.isCompleted);
+        const progressPercent = task.subtasks.length === 0
+            ? 0
+            : Math.round(completedSubtasks.length / task.subtasks.length * 100);
 
         // Добавляем заголовок большой задачи
         htmlContent += `
             <h2>Категория: ${task.title}</h2>
-            <p>Выполнено: ${completedSubtasks.length} из ${task.subtasks.length}</p>
+            <p>Выполнено: ${completedSubtasks.length} из ${task.subtasks.length} (${progressPercent}%)</p>
             <ul>
         `;
 
@@ -73,7 +83,8 @@ addSubtaskBtn.addEventListener('click', () => {
     // 4. Очищаем инпут, чтобы он снова был пустым после добавления
     subtaskInput.value = '';
 
-    // 5. Перерисовываем приложение
+    // 5. Сохраняем данные и перерисовываем приложение
+    saveTasks();
     renderApp();
 });
 
@@ -88,6 +99,7 @@ appContainer.addEventListener('change', (e) => {
             }
         });
 
+        saveTasks();
         renderApp();
     }
 });
