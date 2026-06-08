@@ -15,6 +15,8 @@ const tasks = savedTasks ? JSON.parse(savedTasks) : defaultTasks;
 
 // 2. Находим наш контейнер в HTML
 const appContainer = document.getElementById('app');
+const taskTitleInput = document.getElementById('task-title-input');
+const saveTaskTitleBtn = document.getElementById('save-task-title-btn');
 const subtaskInput = document.getElementById('subtask-input');
 const addSubtaskBtn = document.getElementById('add-subtask-btn');
 
@@ -63,7 +65,22 @@ function renderApp() {
 }
 
 // 4. Запускаем функцию
+taskTitleInput.value = tasks[0].title;
 renderApp();
+
+saveTaskTitleBtn.addEventListener('click', () => {
+    const title = taskTitleInput.value.trim();
+
+    if (title === '') {
+        alert('Сначала введи название большой задачи!');
+        return;
+    }
+
+    tasks[0].title = title;
+
+    saveTasks();
+    renderApp();
+});
 
 addSubtaskBtn.addEventListener('click', () => {
     // 1. Получаем текст из инпута
